@@ -10,13 +10,13 @@ import * as s3d from 'aws-cdk-lib/aws-s3-deployment';
 
 const CODE_PATH = path.join(__dirname, '../../frontend-app/build');
 
-export interface FrontendStackProps extends cdk.StackProps {
+export interface FrontendProps extends cdk.StackProps {
   apiURL: string;
   authURL: string;
 }
 
 export default class FrontendStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props: FrontendStackProps) {
+  constructor(scope: Construct, id: string, props: FrontendProps) {
     super(scope, id, props);
 
     if (!fs.existsSync(CODE_PATH)) {
