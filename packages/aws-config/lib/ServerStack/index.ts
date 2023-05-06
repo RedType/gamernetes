@@ -99,6 +99,8 @@ export default class ServerStack extends cdk.Stack {
         ec2.InitService.enable('gamernetesServer'),
       ].flat()),
     });
+
+    cdk.Tags.of(this.instance).add('AccessCategory', 'gamernetesServer');
   }
 }
 

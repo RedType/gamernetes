@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Construct } from 'constructs';
-import ServerStack from './ServerStack';
 
 import * as cdk from 'aws-cdk-lib';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
@@ -39,16 +38,6 @@ export default class ApiStack extends cdk.Stack {
       handler: 'index.default',
       runtime: lambda.Runtime.NODEJS_18_X,
     });
-      
-    this.api = new apiv2.HttpApi(this, 'HttpApi', {
-      description: 'Gamernetes API',
-      defaultAuthorizer: props.authorizer,
-      defaultIntegration: new apiv2int.HttpLambdaIntegration('HandlerInt', this.handler, {
-      }),
-    });
-  }
-
-  public registerServer(stack: ServerStack) {
     this.handler.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -60,10 +49,22 @@ export default class ApiStack extends cdk.Stack {
         cdk.Arn.format({
           service: 'ec2',
           resource: 'instance',
-          resourceName: stack.instance.instanceId,
+          resourceName: '*',
         }),
       ],
+      conditions: {
+        'StringEquals': {
+          'aws:ResourceTag/AccessCategory': 'gamernetesServer',
+        },
+      },
     }));
+      
+    this.api = new apiv2.HttpApi(this, 'HttpApi', {
+      description: 'Gamernetes API',
+      defaultAuthorizer: props.authorizer,
+      defaultIntegration: new apiv2int.HttpLambdaIntegration('HandlerInt', this.handler, {
+      }),
+    });
   }
 }
 
