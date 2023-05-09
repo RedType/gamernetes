@@ -1,32 +1,22 @@
-import * as path from 'path';
 import { Construct } from 'constructs';
 
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
-export enum ServerKind {
-  COBBLEMON,
-}
-
-const pathOf = (kind: ServerKind) => {
-  switch (kind) {
-  case ServerKind.COBBLEMON:
-    return path.join(__dirname, './cobblemon');
-  }
-}
-
-const packagesOf = (kind: ServerKind) => {
-  switch (kind) {
-  case ServerKind.COBBLEMON:
-    return ['openjdk-17-jre-headless'];
-  }
-}
+import {
+  ServerKind,
+  customPackagesOf,
+  packagesOf,
+  pathOf,
+  publicPortsOf,
+} from './servers';
 
 export interface ServerProps extends cdk.StackProps {
   server: ServerKind;
   vpc: ec2.IVpc;
   extraCommands?: Array<string> | string;
   extraPackages?: Array<string> | string;
+  extraPorts?: ec2.Port | Array<ec2.Port>;
   name?: string;
   runScriptName?:    'run.sh'    | string;
   statusScriptName?: 'status.sh' | string;
@@ -41,6 +31,8 @@ export default class ServerStack extends cdk.Stack {
     const runScript = props.runScriptName ?? 'run.sh';
     const statusScript = props.statusScriptName ?? 'status.sh';
 
+    const { server } = props;
+
     this.instance = new ec2.Instance(this, 'Server', {
       vpc: props.vpc,
       instanceType: new ec2.InstanceType('t4g.xlarge'),
@@ -49,10 +41,13 @@ export default class ServerStack extends cdk.Stack {
         'us-west-2': 'ami-0d9fad4f90eb14fc3',
       }),
       instanceName: props.name || id,
+      keyName: id + 'SSHKey',
       init: ec2.CloudFormationInit.fromElements(...[
         // install packages
-        [...packagesOf(props.server), ...(props.extraPackages ?? [])]
-          .flat().map(p => ec2.InitPackage.apt(p)),
+        [packagesOf(server), (props.extraPackages ?? [])].flat()
+          .map(p => ec2.InitPackage.apt(p)),
+
+        customPackagesOf(server),
 
         // init user
         ec2.InitGroup.fromName('gamernetes'),
@@ -61,7 +56,7 @@ export default class ServerStack extends cdk.Stack {
         }),
 
         // install server assets
-        ec2.InitSource.fromAsset('/srv', pathOf(props.server)),
+        ec2.InitSource.fromAsset('/srv', pathOf(server)),
         ec2.InitCommand.argvCommand([
           'chown', '-R', 'gamernetes:gamernetes', '/srv',
         ]),
@@ -77,7 +72,7 @@ export default class ServerStack extends cdk.Stack {
           command: `/srv/${runScript}`,
           afterNetwork: true,
           cwd: '/srv',
-          description: 'Content server',
+          description: 'Content server for ' + server,
           group: 'gamernetes',
           user: 'gamernetes',
           keepRunning: true,
@@ -88,7 +83,11 @@ export default class ServerStack extends cdk.Stack {
           '# Gamernetes server watchdog',
           '# Checks for activity in server every 15m',
           '0,15,30,45 * * * *  ' +
-            `[ $(/srv/${statusScript}) = "shutdown" ] && shutdown now -h`,
+            `[ $(/srv/${statusScript}) = "idle" ] && shutdown now -h`,
+          '',
+          '# Existence of /var/g.reboot indicates that server just started',
+          '# Intended to be deleted at first status check',
+          '@reboot touch /var/g.reboot && chmod 777 /var/g.reboot',
         ].join('\n')),
 
         // run extra commands
@@ -100,6 +99,22 @@ export default class ServerStack extends cdk.Stack {
       ].flat()),
     });
 
+    // configure firewall
+    this.instance.connections.allowFromAnyIpv4(ec2.Port.tcp(22)); // ssh
+    for (const port of [
+      publicPortsOf(server),
+      (props.extraPorts ?? [])
+    ].flat()) {
+      this.instance.connections.allowFromAnyIpv4(port);
+    }
+
+    // create public ip
+    new ec2.CfnEIP(this, 'ElasticIP', {
+      domain: props.vpc.vpcId,
+      instanceId: this.instance.instanceId,
+    });
+
+    // tag for iam
     cdk.Tags.of(this.instance).add('AccessCategory', 'gamernetesServer');
   }
 }
