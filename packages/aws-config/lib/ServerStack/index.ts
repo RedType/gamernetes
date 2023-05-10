@@ -23,7 +23,7 @@ export interface ServerProps extends cdk.StackProps {
 /**
  * Expected control scripts
  *
- * - init.sh: runs one on server initialization
+ * - init.sh: runs once on server initialization
  * - run.sh: runs on startup
  * - status.sh: runs every 15m to check if server should shut down
  * - shutdown.sh: runs before shutdown
