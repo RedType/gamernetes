@@ -43,6 +43,11 @@ export default class ServerStack extends cdk.Stack {
 
     const { server } = props;
 
+    const sshKey = new ec2.CfnKeyPair(this, 'SSHKey', {
+      keyName: id + 'SSHKey',
+      keyType: 'ed25519',
+    });
+
     this.instance = new ec2.Instance(this, 'Server', {
       vpc: props.vpc,
       instanceType: new ec2.InstanceType('t4g.xlarge'),
@@ -54,7 +59,7 @@ export default class ServerStack extends cdk.Stack {
         'us-west-2': 'ami-086c7bb4748b92860',
       }),
       instanceName: props.name || id,
-      keyName: id + 'SSHKey',
+      keyName: sshKey.keyName,
       init: ec2.CloudFormationInit.fromElements(...[
         // install packages
         [(props.extraPackages ?? [])].flat()
