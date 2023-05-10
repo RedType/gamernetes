@@ -46,9 +46,12 @@ export default class ServerStack extends cdk.Stack {
     this.instance = new ec2.Instance(this, 'Server', {
       vpc: props.vpc,
       instanceType: new ec2.InstanceType('t4g.xlarge'),
+      // Ubuntu 22.04 LTS arm64
       machineImage: ec2.MachineImage.genericLinux({
-        'us-east-1': 'ami-0044130ca185d0880',
-        'us-west-2': 'ami-0d9fad4f90eb14fc3',
+        'us-east-1': 'ami-0b24fed3600b6c89f',
+        'us-east-2': 'ami-09996e4ba81266288',
+        'us-west-1': 'ami-037c671da5c0ba173',
+        'us-west-2': 'ami-086c7bb4748b92860',
       }),
       instanceName: props.name || id,
       keyName: id + 'SSHKey',
