@@ -52,8 +52,8 @@ export default class ServerStack extends cdk.Stack {
       keyType: 'ed25519',
     });
 
-    const instanceId = 'GamernetesServer';
-    this.instance = new ec2.Instance(this, instanceId, {
+    const instanceLogicalId = cdk.Names.uniqueId(this) + 'Server';
+    this.instance = new ec2.Instance(this, 'Server', {
       vpc: props.vpc,
       instanceType: new ec2.InstanceType('t4g.xlarge'),
       // Ubuntu 22.04 LTS arm64
@@ -65,10 +65,10 @@ export default class ServerStack extends cdk.Stack {
       }),
       instanceName: props.name || id,
       keyName: sshKey.keyName,
-      userData: cfnUserData(this, instanceId),
+      userData: cfnUserData(this, instanceLogicalId),
       init: ec2.CloudFormationInit.fromElements(...[
         // cloudformation init
-        cfnInit(this, instanceId),
+        cfnInit(this, instanceLogicalId),
 
         // install packages
         [(props.extraPackages ?? [])].flat()
@@ -135,6 +135,8 @@ export default class ServerStack extends cdk.Stack {
         ec2.InitService.enable('gamernetes'),
       ].flat()),
     });
+    (this.instance.node.defaultChild as ec2.CfnInstance)
+      .overrideLogicalId(instanceLogicalId);
 
     // configure firewall
     this.instance.connections.allowFromAnyIpv4(ec2.Port.tcp(22)); // ssh
