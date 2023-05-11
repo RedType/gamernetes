@@ -14,31 +14,27 @@ const lazy = <T>(init: () => T) => {
 
 export const common = lazy(() => [
   'tar', 'unzip',
-].map(p => ec2.InitPackage.apt(p)));
+].map(p => ec2.InitPackage.yum(p)));
 
 export const java17 = lazy(() => [
-  ec2.InitPackage.apt('openjdk-17-jre-headless'),
+  ec2.InitPackage.yum('java-17-amazon-corretto'),
 ]);
 
-export const rcon = (pass: string = 'uwu', port: number = 25575) => [
-  ec2.InitPackage.apt('rcon'),
-  ec2.InitFile.fromString('/etc/rcon.conf', [
-    '[default]',
-    'host = localhost',
-    'port = ' + port,
-    'passwd = ' + pass,
-  ].join('\n')),
+export const mcrcon = () => [
+  ec2.InitPackage.rpm([
+    'https://kojipkgs.fedoraproject.org//packages/mcrcon/0.7.2',
+    '/4.fc39/aarch64/mcrcon-0.7.2-4.fc39.aarch64.rpm',
+  ].join('')),
 ];
 
 export const tnpLimitless6 = lazy(() => [
-  ec2.InitSource.fromUrl('/srv/LL6.zip', [
+  ec2.InitSource.fromUrl('/srv', [
     'https://mediafilez.forgecdn.net/files/4526/912',
     '/LL6+Full+Server+Files+v1.24.0.zip',
   ].join('')),
-  ec2.InitCommand.argvCommand(['unzip', 'srv/LL6.zip']),
   ec2.InitCommand.shellCommand([
+    'echo "Installing TNP Limitless 6 server"',
     'cd /srv',
-    'unzip LL6.zip',
     'java -jar forge*.jar --installServer',
   ].join(' && ')),
 ]);

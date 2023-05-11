@@ -29,14 +29,14 @@ export const packagesOf = (kind: ServerKind) => {
     return [
       packages.common(),
       packages.java17(),
-      packages.rcon(),
+      packages.mcrcon(),
       packages.cobblemon(),
     ].flat();
   case ServerKind.TNP_LIMITLESS_6:
     return [
       packages.common(),
       packages.java17(),
-      packages.rcon(),
+      packages.mcrcon(),
       packages.tnpLimitless6(),
     ].flat();
   }
