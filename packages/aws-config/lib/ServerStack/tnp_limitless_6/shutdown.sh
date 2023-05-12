@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-mcrcon stop
+mcrcon -p uwu stop
 

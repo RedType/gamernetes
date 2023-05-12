@@ -1,16 +1,6 @@
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
-const lazy = <T>(init: () => T) => {
-  let t: T | undefined;
-
-  return () => {
-    if (t === undefined) {
-      t = init();
-    }
-
-    return t;
-  };
-};
+import { lazy } from '../util';
 
 export const common = lazy(() => [
   'tar', 'unzip',

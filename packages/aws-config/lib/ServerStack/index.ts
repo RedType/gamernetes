@@ -13,7 +13,7 @@ import {
 
 export interface ServerProps extends cdk.StackProps {
   server: ServerKind;
-  vpc: ec2.IVpc;
+  vpc?: ec2.IVpc;
   name?: string;
   shutdownTimer?: number; // minutes, default 0
 }
@@ -41,19 +41,24 @@ export default class ServerStack extends cdk.Stack {
 
     const { server } = props;
 
+    const vpc = props.vpc ?? ec2.Vpc.fromLookup(this, 'DefaultVPC', { isDefault: true });
+
     const sshKey = new ec2.CfnKeyPair(this, 'SSHKey', {
       keyName: id + 'SSHKey',
       keyType: 'ed25519',
     });
 
     this.instance = new ec2.Instance(this, 'Server', {
-      vpc: props.vpc,
+      vpc,
       instanceType: new ec2.InstanceType('t4g.xlarge'),
       machineImage: ec2.MachineImage.latestAmazonLinux2023({
         cpuType: ec2.AmazonLinuxCpuType.ARM_64,
       }),
       instanceName: props.name || id,
       keyName: sshKey.keyName,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
       initOptions: {
         configSets: ['default'],
       },
@@ -76,8 +81,7 @@ export default class ServerStack extends cdk.Stack {
               'echo "Configuring..."',
               'ls -alh /srv',
               'chown -R gamernetes:gamernetes /srv',
-              'chmod -R 774 /srv', // rwxrwxr--
-              'chmod +t /srv', // add sticky
+              'chmod -R 1775 /srv', // drwxrwxr-t
               'cd /srv',
               './init.sh',
             ].join(' && ')),
@@ -95,7 +99,7 @@ export default class ServerStack extends cdk.Stack {
 
     // create public ip
     new ec2.CfnEIP(this, 'ElasticIP', {
-      domain: props.vpc.vpcId,
+      domain: vpc.vpcId,
       instanceId: this.instance.instanceId,
     });
 

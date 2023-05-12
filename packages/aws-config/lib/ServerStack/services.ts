@@ -5,7 +5,7 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
   ec2.InitFile.fromString('/etc/systemd/system/gamernetes.service', [
     '[Unit]',
     'Description=Gamernetes content server',
-    'Wants=network.target gStatus.service gWatchdog.timer',
+    'Wants=network.target gWatchdog.timer',
     'After=network.target',
     '',
     '[Service]',
@@ -21,17 +21,6 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     'WantedBy=multi-user.target',
   ].join('\n')),
 
-  // status file service
-  ec2.InitFile.fromString('/etc/systemd/system/gStatus.service', [
-    '[Unit]',
-    'Description=Gamernetes status file toucher',
-    '',
-    '[Service]',
-    'Type=oneshot',
-    'ExecStart=/bin/bash -c ' +
-      '"touch /var/g.coldstart && chmod 777 /var/g.coldstart"',
-  ].join('\n')),
-
   // watchdog script
   ec2.InitFile.fromString('/usr/local/lib/gamernetes/watchdog.sh', [
     '#!/bin/bash',
@@ -45,7 +34,10 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     'else',
     '  echo "Server is active"',
     'fi',
-  ].join('\n')),
+  ].join('\n'), {
+    mode: '000774',
+    group: 'gamernetes',
+  }),
 
   // watchdog unit
   ec2.InitFile.fromString('/etc/systemd/system/gWatchdog.service', [
@@ -54,6 +46,7 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     '',
     '[Service]',
     'Type=oneshot',
+    'Group=gamernetes',
     'ExecStart=/usr/local/lib/gamernetes/watchdog.sh',
   ].join('\n')),
 
@@ -64,7 +57,8 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     '',
     '[Timer]',
     'Unit=gWatchdog.service',
-    'OnUnitActiveSec=15min',
+    'OnActiveSec=10min',
+    'OnUnitActiveSec=10min',
   ].join('\n')),
 
   // start services
