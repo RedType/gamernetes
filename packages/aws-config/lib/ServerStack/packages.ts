@@ -35,7 +35,7 @@ export const tnpLimitless6 = lazy(() => [
   ec2.InitCommand.shellCommand([
     'echo "Installing TNP Limitless 6 server"',
     'cd /srv',
-    'java -jar forge*.jar --installServer',
+    'java -jar forge*.jar --installServer >/dev/null',
   ].join(' && ')),
 ]);
 
