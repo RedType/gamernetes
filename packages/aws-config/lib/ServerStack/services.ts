@@ -25,9 +25,10 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
   ec2.InitFile.fromString('/usr/local/lib/gamernetes/watchdog.sh', [
     '#!/bin/bash',
     '',
-    'if /srv/status.sh | grep -q "idle"; then ' +
-      'systemctl stop gamernetes; ' +
-      `shutdown -h +${shutdownTimer}; ` +
+    'if /srv/status.sh | grep -q "idle"; then',
+    '  echo "Server is idle; shutting down"',
+    '  systemctl stop gamernetes',
+    `  shutdown -h +${shutdownTimer}`,
     'fi',
   ].join('\n')),
 
@@ -35,37 +36,36 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
   ec2.InitFile.fromString('/etc/systemd/system/gWatchdog.service', [
     '[Unit]',
     'Description=Gamernetes watchdog',
-    'Wants=gamernetes.service',
     '',
     '[Service]',
-    'Type=simple',
-    'User=gamernetes',
-    'Group=gamernetes',
-    'WorkingDirectory=/srv',
-    'ExecStart=/srv/run.sh',
-    'ExecStop=/srv/shutdown.sh',
-    'Restart=on-failure',
-    '',
-    '[Install]',
-    'WantedBy=gamernetes.service',
-  ].join('\n'),
+    'Type=oneshot',
+    'ExecStart=/usr/local/lib/gamernetes/watchdog.sh',
+  ].join('\n')),
 
   // watchdog timer
   ec2.InitFile.fromString('/etc/systemd/system/gWatchdog.timer', [
-    '# Gamernetes server watchdog',
-    '# Checks for activity in server every 15m',
-    '0,15,30,45 * * * *  ' +
-      'if /srv/status.sh | grep -q "idle"; then ' +
-        'systemctl stop gamernetes; ' +
-        `shutdown -h +${shutdownTimer}; ` +
-      'fi',
+    '[Unit]',
+    'Description=Gamernetes watchdog',
     '',
-    '# Existence of /var/g.coldstart indicates that server just started',
-    '# Intended to be deleted at first status check',
-    '@reboot touch /var/g.coldstart && chmod 777 /var/g.coldstart',
+    '[Timer]',
+    'OnUnitActiveSec=15min',
+    '',
+    '[Install]',
+    'WantedBy=timers.target',
   ].join('\n')),
 
-  // status file unit
+  // status file service
+  ec2.InitFile.fromString('/etc/systemd/system/gStatus.service', [
+    '[Unit]',
+    'Description=Gamernetes status file toucher',
+    '',
+    '[Service]',
+    'Type=oneshot',
+    'ExecStart=/bin/bash -c ' +
+      '"touch /var/g.coldstart && chmod 777 /var/g.coldstart"',
+  ].join('\n')),
+
+  // status file timer
   ec2.InitFile.fromString('/etc/systemd/system/gStatus.timer', [
     '[Unit]',
     'Description=Gamernetes status file toucher',
@@ -77,8 +77,9 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     'WantedBy=timers.target',
   ].join('\n')),
 
-  // start server
-  ec2.InitService.enable('crond'),
+  // start services
   ec2.InitService.enable('gamernetes'),
+  ec2.InitService.enable('gWatchdog'),
+  ec2.InitService.enable('gStatus'),
 ]);
 

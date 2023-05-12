@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
+import systemdServices from './services';
 import {
   ServerKind,
   packagesOf,
@@ -23,7 +24,7 @@ export interface ServerProps extends cdk.StackProps {
  * - init.sh: runs once on server initialization
  * - run.sh: runs on startup
  * - status.sh: runs every 15m to check if server should shut down
- * - shutdown.sh: runs before shutdown
+ * - shutdown.sh: runs to initiate shutdown
  *
  * status.sh may check to see if the server was just started by
  * checking /var/g.reboot, and print a status other than "idle", which
@@ -81,66 +82,7 @@ export default class ServerStack extends cdk.Stack {
               './init.sh',
             ].join(' && ')),
           ].flat()),
-          services: new ec2.InitConfig([
-            // systemd unit
-            ec2.InitFile.fromString('/etc/systemd/system/gamernetes.service', [
-              '[Unit]',
-              'Description=Content server for ' + server,
-              'Wants=network.target',
-              'After=network.target',
-              '',
-              '[Service]',
-              'Type=simple',
-              'User=gamernetes',
-              'Group=gamernetes',
-              'WorkingDirectory=/srv',
-              'ExecStart=/srv/run.sh',
-              'ExecStop=/srv/shutdown.sh',
-              'Restart=on-failure',
-              '',
-              '[Install]',
-              'WantedBy=multi-user.target',
-            ].join('\n')),
-
-            // watchdog script
-            ec2.InitFile.fromString('/usr/local/lib/gamernetes/watchdog.sh', [
-              'if /srv/status.sh | grep -q "idle"; then ' +
-                'systemctl stop gamernetes; ' +
-                `shutdown -h +${props.shutdownTimer ?? 0}; ` +
-              'fi',
-            ].join('\n')),
-
-            // watchdog unit
-            ec2.InitFile.fromString('/etc/systemd/system/gamernetesWatchdog.timer', [
-              '# Gamernetes server watchdog',
-              '# Checks for activity in server every 15m',
-              '0,15,30,45 * * * *  ' +
-                'if /srv/status.sh | grep -q "idle"; then ' +
-                  'systemctl stop gamernetes; ' +
-                  `shutdown -h +${props.shutdownTimer ?? 0}; ` +
-                'fi',
-              '',
-              '# Existence of /var/g.coldstart indicates that server just started',
-              '# Intended to be deleted at first status check',
-              '@reboot touch /var/g.coldstart && chmod 777 /var/g.coldstart',
-            ].join('\n')),
-
-            // status file unit
-            ec2.InitFile.fromString('/etc/systemd/system/gamernetesStatus.timer', [
-              '[Unit]',
-              'Description=Gamernetes status file toucher',
-              '',
-              '[Timer]',
-              'OnBootSec=0',
-              '',
-              '[Install]',
-              'WantedBy=timers.target',
-            ].join('\n')),
-
-            // start server
-            ec2.InitService.enable('crond'),
-            ec2.InitService.enable('gamernetes'),
-          ].flat()),
+          services: systemdServices(props.shutdownTimer),
         },
       }),
     });
