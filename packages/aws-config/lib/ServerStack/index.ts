@@ -11,11 +11,22 @@ import {
   publicPortsOf,
 } from './servers';
 
+type InstanceSize =
+  | 'nano'
+  | 'micro'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'xlarge'
+  | '2xlarge'
+  ;
+
 export interface ServerProps extends cdk.StackProps {
   server: ServerKind;
-  vpc?: ec2.IVpc;
   name?: string;
+  size?: InstanceSize;
   shutdownTimer?: number; // minutes, default 0
+  vpc?: ec2.IVpc;
 }
 
 /**
@@ -41,6 +52,7 @@ export default class ServerStack extends cdk.Stack {
 
     const { server } = props;
 
+    const instanceType = `t4g.${props.size || 'large'}`;
     const vpc = props.vpc ?? ec2.Vpc.fromLookup(this, 'DefaultVPC', { isDefault: true });
 
     const sshKey = new ec2.CfnKeyPair(this, 'SSHKey', {
@@ -50,7 +62,7 @@ export default class ServerStack extends cdk.Stack {
 
     this.instance = new ec2.Instance(this, 'Server', {
       vpc,
-      instanceType: new ec2.InstanceType('t4g.xlarge'),
+      instanceType: new ec2.InstanceType(instanceType),
       machineImage: ec2.MachineImage.latestAmazonLinux2023({
         cpuType: ec2.AmazonLinuxCpuType.ARM_64,
       }),

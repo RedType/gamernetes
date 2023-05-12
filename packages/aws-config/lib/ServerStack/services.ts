@@ -57,7 +57,7 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     '',
     '[Timer]',
     'Unit=gWatchdog.service',
-    'OnActiveSec=10min',
+    'OnActiveSec=30min',
     'OnUnitActiveSec=10min',
   ].join('\n')),
 

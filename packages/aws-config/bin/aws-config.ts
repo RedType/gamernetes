@@ -12,10 +12,12 @@ const env: cdk.Environment = {
 
 const app = new cdk.App();
 
+/*
 new ServerStack(app, 'TnpLimitless6', {
   env,
   server: ServerStack.Kind.TNP_LIMITLESS_6,
 });
+*/
 
 app.synth();
 
