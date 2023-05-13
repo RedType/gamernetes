@@ -87,8 +87,9 @@ export default class ServerStack extends cdk.Stack {
             packagesOf(server),
           ].flat()),
           configure: new ec2.InitConfig([
-            // install server assets
+            // patch server assets
             ec2.InitSource.fromAsset('/srv', pathOf(server)),
+            // configure
             ec2.InitCommand.shellCommand([
               'echo "Configuring..."',
               'ls -alh /srv',

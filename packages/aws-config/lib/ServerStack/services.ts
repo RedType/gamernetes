@@ -15,7 +15,7 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     'WorkingDirectory=/srv',
     'ExecStart=/srv/run.sh',
     'ExecStop=/srv/shutdown.sh',
-    'Restart=on-failure',
+    'Restart=always',
     '',
     '[Install]',
     'WantedBy=multi-user.target',

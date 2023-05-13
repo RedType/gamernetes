@@ -17,6 +17,68 @@ export const mcrcon = () => [
   ].join('')),
 ];
 
+export const atm7 = lazy(() => [
+  ec2.InitSource.fromUrl('/srv', [
+    'https://mediafilez.forgecdn.net/files/4034/8',
+    '/ATM7-0.4.34-server.zip',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/geckolib-forge-1.18-3.0.57.jar', [
+    'https://mediafilez.forgecdn.net/files/4181/370',
+    '/geckolib-forge-1.18-3.0.57.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/DragonSurvival-1.18.2-1.5.42.jar', [
+    'https://mediafilez.forgecdn.net/files/4509/338',
+    '/DragonSurvival-1.18.2-1.5.42.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/supersaturation-1.18.2-3.0.3.jar', [
+    'https://mediafilez.forgecdn.net/files/3874/507',
+    '/supersaturation-1.18.2-3.0.3.jar'
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/pamhc2foodcore-1.18.2-1.0.3.jar', [
+    'https://mediafilez.forgecdn.net/files/3951/938',
+    '/pamhc2foodcore-1.18.2-1.0.3.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/pamhc2crops-1.18.2-1.0.5.jar', [
+    'https://mediafilez.forgecdn.net/files/4050/832',
+    '/pamhc2crops-1.18.2-1.0.5.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/pamhc2trees-1.18.2-1.0.4.jar', [
+    'https://mediafilez.forgecdn.net/files/4360/314',
+    '/pamhc2trees-1.18.2-1.0.4.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/pamhc2foodextended-1.18.2-1.0.5.jar', [
+    'https://mediafilez.forgecdn.net/files/3998/848',
+    '/pamhc2foodextended-1.18.2-1.0.5.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/NethersDelight-1.18.2-2.2.0.jar', [
+    'https://mediafilez.forgecdn.net/files/3756/127',
+    '/NethersDelight-1.18.2-2.2.0.jar'
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/Tinkers+Reforged+1.18.2-2.0.6.jar', [
+    'https://mediafilez.forgecdn.net/files/4494/766',
+    '/Tinkers+Reforged+1.18.2-2.0.6.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/create_food-1.18.2.jar', [
+    'https://mediafilez.forgecdn.net/files/4332/206',
+    '/create_food-1.18.2.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/createfa-1.18.2-1.0.11.jar', [
+    'https://mediafilez.forgecdn.net/files/3955/938',
+    '/createfa-1.18.2-1.0.11.jar',
+  ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/sliceanddice-1.1.3.jar', [
+    'https://mediafilez.forgecdn.net/files/4410/533',
+    '/sliceanddice-1.1.3.jar',
+  ].join('')),
+  ec2.InitCommand.shellCommand([
+    'echo "Installing All the Mods 7 server"',
+    'rm /srv/mods/geckolib-forge-1.18-3.0.45.jar',
+    'cd /srv',
+    'chmod +x startserver.sh',
+    'ATM7_INSTALL_ONLY=true ./startserver.sh >/dev/null',
+  ].join(' && ')),
+]);
+
 export const tnpLimitless6 = lazy(() => [
   ec2.InitSource.fromUrl('/srv', [
     'https://mediafilez.forgecdn.net/files/4526/912',

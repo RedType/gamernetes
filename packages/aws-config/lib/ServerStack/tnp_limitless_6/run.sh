@@ -7,7 +7,5 @@ java \
   @user_jvm_args.txt \
   @libraries/net/minecraftforge/forge/1.19.2-43.2.8/unix_args.txt \
   --nogui \
-  "$@" &
-
-wait $!
+  "$@"
 
