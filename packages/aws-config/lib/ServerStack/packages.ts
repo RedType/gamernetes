@@ -26,6 +26,10 @@ export const atm7 = lazy(() => [
     'https://mediafilez.forgecdn.net/files/4181/370',
     '/geckolib-forge-1.18-3.0.57.jar',
   ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/creeperoverhaul-1.3.1-forge.jar', [
+    'https://mediafilez.forgecdn.net/files/4063/132',
+    '/creeperoverhaul-1.3.1-forge.jar',
+  ].join('')),
   ec2.InitFile.fromUrl('/srv/mods/DragonSurvival-1.18.2-1.5.42.jar', [
     'https://mediafilez.forgecdn.net/files/4509/338',
     '/DragonSurvival-1.18.2-1.5.42.jar',
@@ -64,8 +68,9 @@ export const atm7 = lazy(() => [
   ].join('')),
   ec2.InitCommand.shellCommand([
     'echo "Installing All the Mods 7 server"',
-    'rm /srv/mods/geckolib-forge-1.18-3.0.45.jar',
     'cd /srv',
+    'rm mods/geckolib-forge-1.18-3.0.45.jar',
+    'rm mods/creeperoverhaul-1.18.2-1.3.0-forge.jar',
     'chmod +x startserver.sh',
     'ATM7_INSTALL_ONLY=true ./startserver.sh >/dev/null',
   ].join(' && ')),
