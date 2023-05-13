@@ -58,17 +58,9 @@ export const atm7 = lazy(() => [
     'https://mediafilez.forgecdn.net/files/4494/766',
     '/Tinkers+Reforged+1.18.2-2.0.6.jar',
   ].join('')),
-  ec2.InitFile.fromUrl('/srv/mods/create_food-1.18.2.jar', [
-    'https://mediafilez.forgecdn.net/files/4332/206',
-    '/create_food-1.18.2.jar',
-  ].join('')),
-  ec2.InitFile.fromUrl('/srv/mods/createfa-1.18.2-1.0.11.jar', [
-    'https://mediafilez.forgecdn.net/files/3955/938',
-    '/createfa-1.18.2-1.0.11.jar',
-  ].join('')),
-  ec2.InitFile.fromUrl('/srv/mods/sliceanddice-1.1.3.jar', [
-    'https://mediafilez.forgecdn.net/files/4410/533',
-    '/sliceanddice-1.1.3.jar',
+  ec2.InitFile.fromUrl('/srv/mods/TCIntegrations-1.18.2-2.0.15.0.jar', [
+    'https://mediafilez.forgecdn.net/files/4095/272',
+    '/TCIntegrations-1.18.2-2.0.15.0.jar',
   ].join('')),
   ec2.InitCommand.shellCommand([
     'echo "Installing All the Mods 7 server"',
