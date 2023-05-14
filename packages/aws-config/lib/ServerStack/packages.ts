@@ -130,6 +130,11 @@ export const atm7 = lazy(() => [
     'https://mediafilez.forgecdn.net/files/4019/488',
     '/Kobolds-2.1.2.jar',
   ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/FriendlyFire-Forge-1.18.2-11.0.3.jar', [
+    'https://mediafilez.forgecdn.net/files/4409/366',
+    '/FriendlyFire-Forge-1.18.2-11.0.3.jar',
+  ].join('')),
+
   ec2.InitCommand.shellCommand([
     'echo "Installing All the Mods 7 server"',
     'cd /srv',
