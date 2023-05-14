@@ -14,7 +14,7 @@ const app = new cdk.App();
 
 new ServerStack(app, 'AllTheMods7', {
   env,
-  server: ServerStack.Kind.ALL_THE_MODS_7,
+  server: ServerStack.Kind.ALL_THE_DRAGONS_7,
   size: 'xlarge',
 });
 
