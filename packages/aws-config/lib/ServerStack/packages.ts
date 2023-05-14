@@ -28,33 +28,18 @@ export const atm7 = lazy(() => [
     'https://mediafilez.forgecdn.net/files/4181/370',
     '/geckolib-forge-1.18-3.0.57.jar',
   ].join('')),
-  ec2.InitCommand.argvCommand([
-    'rm', '/src/mods/geckolib-forge-1.18-3.0.45.jar',
-  ]),
-
   ec2.InitFile.fromUrl('/srv/mods/creeperoverhaul-1.3.1-forge.jar', [
     'https://mediafilez.forgecdn.net/files/4063/132',
     '/creeperoverhaul-1.3.1-forge.jar',
   ].join('')),
-  ec2.InitCommand.argvCommand([
-    'rm', '/src/mods/creeperoverhaul-1.18.2-1.3.0-forge.jar',
-  ]),
-
   ec2.InitFile.fromUrl('/srv/mods/create-1.18.2-0.5.0.i.jar', [
     'https://mediafilez.forgecdn.net/files/4371/807',
     '/create-1.18.2-0.5.0.i.jar',
   ].join('')),
-  ec2.InitCommand.argvCommand([
-    'rm', '/src/mods/create-1.18.2-0.5.0.e.jar',
-  ]),
-
   ec2.InitFile.fromUrl('/srv/mods/createaddition-1.18.2-20230507a.jar', [
     'https://mediafilez.forgecdn.net/files/4526/962',
     '/createaddition-1.18.2-20230507a.jar',
   ].join('')),
-  ec2.InitCommand.argvCommand([
-    'rm', '/srv/mods/createaddition-1.18.2-20220914a.jar',
-  ]),
 
   // new packages
   ec2.InitFile.fromUrl('/srv/mods/DragonSurvival-1.18.2-1.5.42.jar', [
@@ -141,9 +126,17 @@ export const atm7 = lazy(() => [
     'https://mediafilez.forgecdn.net/files/4492/534',
     '/thedragonsays-1.3.0.jar',
   ].join('')),
+  ec2.InitFile.fromUrl('/srv/mods/Kobolds-2.1.2.jar', [
+    'https://mediafilez.forgecdn.net/files/4019/488',
+    '/Kobolds-2.1.2.jar',
+  ].join('')),
   ec2.InitCommand.shellCommand([
     'echo "Installing All the Mods 7 server"',
     'cd /srv',
+    'rm mods/geckolib-forge-1.18-3.0.45.jar',
+    'rm mods/creeperoverhaul-1.18.2-1.3.0-forge.jar',
+    'rm mods/create-1.18.2-0.5.0.e.jar',
+    'rm mods/createaddition-1.18.2-20220914a.jar',
     'chmod +x startserver.sh',
     'ATM7_INSTALL_ONLY=true ./startserver.sh >/dev/null',
   ].join(' && ')),
