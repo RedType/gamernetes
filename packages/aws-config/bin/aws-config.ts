@@ -12,10 +12,10 @@ const env: cdk.Environment = {
 
 const app = new cdk.App();
 
-new ServerStack(app, 'AllTheMods7', {
+new ServerStack(app, 'AllOfFabricmon6', {
   env,
-  server: ServerStack.Kind.ALL_THE_DRAGONS_7,
-  size: 'xlarge',
+  server: ServerStack.Kind.ALL_OF_FABRICMON_6,
+  size: 'large',
 });
 
 app.synth();
