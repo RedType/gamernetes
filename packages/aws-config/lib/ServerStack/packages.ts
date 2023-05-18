@@ -29,5 +29,3 @@ export const tnpLimitless6 = lazy(() => [
   ].join(' && ')),
 ]);
 
-export const cobblemon = () => { throw new Error('Cobblemon is NYI') };
-

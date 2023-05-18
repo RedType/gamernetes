@@ -12,9 +12,9 @@ const env: cdk.Environment = {
 
 const app = new cdk.App();
 
-new ServerStack(app, 'AllOfFabricmon6', {
+new ServerStack(app, 'Birdpack', {
   env,
-  server: ServerStack.Kind.ALL_OF_FABRICMON_6,
+  server: ServerStack.Kind.BIRDPACK,
   size: 'xlarge',
 });
 

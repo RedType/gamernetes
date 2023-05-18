@@ -9,7 +9,8 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     'After=network.target',
     '',
     '[Service]',
-    'Type=simple',
+    'Type=forking',
+    'PIDFile=/var/gamernetes/server.pid',
     'User=gamernetes',
     'Group=gamernetes',
     'WorkingDirectory=/srv',
@@ -60,6 +61,12 @@ export default (shutdownTimer: number = 0) => new ec2.InitConfig([
     'OnActiveSec=30min',
     'OnUnitActiveSec=10min',
   ].join('\n')),
+
+  ec2.InitCommand.shellCommand([
+    'mkdir /var/gamernetes',
+    'chown gamernetes:gamernetes /var/gamernetes',
+    'chmod 1775 /var/gamernetes', // drwxrwxr-t
+  ].join(' && ')),
 
   // start services
   ec2.InitService.enable('gamernetes'),
