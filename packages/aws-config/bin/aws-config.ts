@@ -15,7 +15,7 @@ const app = new cdk.App();
 new ServerStack(app, 'AllOfFabricmon6', {
   env,
   server: ServerStack.Kind.ALL_OF_FABRICMON_6,
-  size: 'large',
+  size: 'xlarge',
 });
 
 app.synth();
